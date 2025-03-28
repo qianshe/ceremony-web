@@ -1,0 +1,146 @@
+/* 传统文化风格主题 */
+
+// 颜色变量
+:root {
+  // 主色调 - 中国红
+  --primary-color: #c62f2f;
+  // 喜事主色 - 红色
+  --happy-color: #c62f2f;
+  // 白事主色 - 灰蓝色 (更庄重但不过于压抑)
+  --memorial-color: #5d7896;
+  
+  // 辅助色
+  --light-bg: #f9f6f1;  // 米白色背景
+  --dark-bg: #424242;   // 深灰色
+  --gold: #d4af37;      // 金色
+  --paper-color: #fcf5e6; // 宣纸色
+  
+  // 文字颜色
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-light: #999999;
+}
+
+// 全局样式
+body {
+  font-family: "SimSun", "STSong", "FangSong", serif;
+  background-color: var(--light-bg);
+  color: var(--text-primary);
+}
+
+// 传统边框样式 - 仿宣纸效果
+.traditional-card {
+  background-color: var(--paper-color);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--gold));
+    border-radius: 4px 4px 0 0;
+  }
+}
+
+// 喜庆主题卡片
+.happy-card {
+  @extend .traditional-card;
+  
+  &::before {
+    background: var(--happy-color);
+  }
+}
+
+// 祭祀主题卡片
+.memorial-card {
+  @extend .traditional-card;
+  
+  &::before {
+    background: var(--memorial-color);
+  }
+}
+
+// 按钮样式
+.traditional-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "FangSong", serif;
+  transition: opacity 0.3s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &.happy {
+    background-color: var(--happy-color);
+  }
+  
+  &.memorial {
+    background-color: var(--memorial-color);
+  }
+}
+
+// 传统装饰元素
+.chinese-pattern {
+  background-image: url('/src/assets/images/pattern.svg');
+  background-repeat: repeat;
+  opacity: 0.1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+// 标题样式
+.chinese-title {
+  font-family: "STZhongsong", "SimSun", serif;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-color);
+  }
+}
+
+// 自定义滚动条
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--text-light);
+  border-radius: 4px;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .traditional-card {
+    padding: 15px;
+  }
+} 
