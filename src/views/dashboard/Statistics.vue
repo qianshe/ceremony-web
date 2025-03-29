@@ -177,8 +177,8 @@
 
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue'
-import AdminLayout from '../components/AdminLayout.vue'
-import api from '../api'
+import AdminLayout from '@/components/AdminLayout.vue'
+import api from '@/api'
 
 // 导入图表库
 import * as echarts from 'echarts'
@@ -622,4 +622,4 @@ const formatDate = (date) => {
     background-color: #67c23a;
   }
 }
-</style> 
+</style>

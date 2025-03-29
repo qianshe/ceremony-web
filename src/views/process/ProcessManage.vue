@@ -241,7 +241,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import AdminLayout from '../components/AdminLayout.vue'
+import AdminLayout from '@/components/AdminLayout.vue'
 
 // 当前流程分类
 const currentProcessCategory = ref(0)
@@ -733,4 +733,4 @@ const handleDelete = (item, index) => {
     }
   }
 }
-</style> 
+</style>

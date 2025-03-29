@@ -279,8 +279,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import AdminLayout from '../components/AdminLayout.vue'
-import api from '../api'
+import AdminLayout from '@/components/AdminLayout.vue'
+import api from '@/api'
 
 // 数据加载状态
 const loading = ref(false)
@@ -632,4 +632,4 @@ const getSupplierTypeText = (type) => {
   display: flex;
   justify-content: flex-end;
 }
-</style> 
+</style>

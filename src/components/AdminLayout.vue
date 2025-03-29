@@ -9,6 +9,7 @@
       
       <el-menu
         :default-active="activeMenu"
+        :default-openeds="defaultOpeneds"
         class="sidebar-menu"
         background-color="var(--paper-color)"
         text-color="var(--text-primary)"
@@ -21,7 +22,7 @@
           <template #title>控制台</template>
         </el-menu-item>
         
-        <el-sub-menu index="products">
+        <el-sub-menu index="/product">
           <template #title>
             <el-icon><el-icon-goods /></el-icon>
             <span>商品管理</span>
@@ -93,7 +94,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人信息</el-dropdown-item>
+                <el-dropdown-item @click="router.push('/user/profile')">个人信息</el-dropdown-item>
                 <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -104,6 +105,15 @@
       <!-- 内容展示区 -->
       <div class="content-wrapper">
         <slot></slot>
+      </div>
+      
+      <!-- 底部备案信息 -->
+      <div class="footer">
+        <div class="footer-content">
+          <p>© 2023 乡镇红白事一站式服务平台 版权所有</p>
+          <p>备案号：浙ICP备XXXXXXXX号 | 公安备案号：33010xxxxxx</p>
+          <p>技术支持：XXXX科技有限公司</p>
+        </div>
       </div>
     </div>
   </div>
@@ -124,7 +134,21 @@ const username = ref('管理员')
 
 // 当前活动菜单项
 const activeMenu = computed(() => {
+  // 如果当前路径以/product开头，则返回/product作为活动菜单
+  if (route.path.startsWith('/product-')) {
+    return '/product'
+  }
   return route.path
+})
+
+// 默认展开的子菜单
+const defaultOpeneds = computed(() => {
+  const openeds = []
+  // 如果当前路径以/product开头，则默认展开商品管理菜单
+  if (route.path.startsWith('/product-')) {
+    openeds.push('/product')
+  }
+  return openeds
 })
 
 // 当前页面标题
@@ -237,6 +261,24 @@ const handleLogout = () => {
   background-color: var(--light-bg);
 }
 
+.footer {
+  padding: 15px 0;
+  background-color: var(--paper-color);
+  border-top: 1px solid #eee;
+  text-align: center;
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    p {
+      margin: 5px 0;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .admin-layout {
     .sidebar {
@@ -256,4 +298,4 @@ const handleLogout = () => {
     padding: 15px;
   }
 }
-</style> 
+</style>

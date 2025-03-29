@@ -215,7 +215,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import AdminLayout from '../components/AdminLayout.vue'
+import AdminLayout from '@/components/AdminLayout.vue'
 
 // 搜索表单
 const searchForm = reactive({
@@ -491,4 +491,4 @@ const handleDelete = (id) => {
   display: flex;
   justify-content: flex-end;
 }
-</style> 
+</style>

@@ -1,5 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+// 导入各模块组件
+import { Login } from '../views/auth'
+import { Dashboard, Statistics } from '../views/dashboard'
+import { UserManage, UserProfile } from '../views/user'
+import { ProductManage, ProductCategory, ProductSupplier } from '../views/product'
+import { OrderManage } from '../views/order'
+import { ProcessManage } from '../views/process'
+import { NotFound } from '../views/common'
+
 // 路由配置
 const routes = [
   {
@@ -9,61 +18,67 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue'),
+    component: Login,
     meta: { title: '登录', requiresAuth: false }
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: () => import('../views/Dashboard.vue'),
+    component: Dashboard,
     meta: { title: '管理控制台', requiresAuth: true }
   },
   {
     path: '/product-manage',
     name: 'ProductManage',
-    component: () => import('../views/ProductManage.vue'),
+    component: ProductManage,
     meta: { title: '商品管理', requiresAuth: true }
   },
   {
     path: '/product-category',
     name: 'ProductCategory',
-    component: () => import('../views/ProductCategory.vue'),
+    component: ProductCategory,
     meta: { title: '商品分类', requiresAuth: true }
   },
   {
     path: '/product-supplier',
     name: 'ProductSupplier',
-    component: () => import('../views/ProductSupplier.vue'),
+    component: ProductSupplier,
     meta: { title: '供应商管理', requiresAuth: true }
   },
   {
     path: '/order-manage',
     name: 'OrderManage',
-    component: () => import('../views/OrderManage.vue'),
+    component: OrderManage,
     meta: { title: '订单管理', requiresAuth: true }
   },
   {
     path: '/process-manage',
     name: 'ProcessManage',
-    component: () => import('../views/ProcessManage.vue'),
+    component: ProcessManage,
     meta: { title: '流程管理', requiresAuth: true }
   },
   {
     path: '/user-manage',
     name: 'UserManage',
-    component: () => import('../views/UserManage.vue'),
+    component: UserManage,
     meta: { title: '用户管理', requiresAuth: true }
+  },
+  {
+    path: '/user/profile',
+    name: 'UserProfile',
+    component: UserProfile,
+    meta: { title: '个人信息', requiresAuth: true }
   },
   {
     path: '/statistics',
     name: 'Statistics',
-    component: () => import('../views/Statistics.vue'),
+    component: Statistics,
     meta: { title: '统计分析', requiresAuth: true }
   },
   {
     path: '/:catchAll(.*)',
     name: 'NotFound',
-    component: () => import('../views/NotFound.vue'),
+    component: NotFound,
     meta: { title: '404 Not Found', requiresAuth: false }
   }
 ]
@@ -91,4 +106,4 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-export default router 
+export default router

@@ -96,8 +96,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import AdminLayout from '../components/AdminLayout.vue'
-import api from '../api'
+import AdminLayout from '@/components/AdminLayout.vue'
+import api from '@/api'
 
 // 待办列表
 const todoList = ref([])
@@ -480,4 +480,4 @@ const handleTodoAction = (todo) => {
     }
   }
 }
-</style> 
+</style>

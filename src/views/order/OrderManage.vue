@@ -247,7 +247,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import AdminLayout from '../components/AdminLayout.vue'
+import AdminLayout from '@/components/AdminLayout.vue'
 
 // 搜索表单
 const searchForm = reactive({
@@ -602,4 +602,4 @@ const handlePrint = () => {
     border-left: 3px solid #eee;
   }
 }
-</style> 
+</style>

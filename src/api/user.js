@@ -39,3 +39,13 @@ export function resetPassword(id, data) {
 export function changeUserStatus(id, status) {
   return put(`/user/${id}/status`, { status })
 } 
+
+// 更新个人信息
+export function updateUserInfo(data) {
+  return put('/user/profile', data)
+}
+
+// 修改密码
+export function updatePassword(data) {
+  return post('/user/change-password', data)
+}
