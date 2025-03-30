@@ -5,6 +5,16 @@ export function login(data) {
   return post('/user/login', data)
 }
 
+// 获取微信登录二维码
+export function getWechatQrCode() {
+  return get('/user/wechat/qrcode')
+}
+
+// 检查微信扫码登录状态
+export function checkWechatLogin(sceneId) {
+  return get('/user/wechat/check', { sceneId })
+}
+
 // 获取用户信息
 export function getUserInfo() {
   return get('/user/info')
