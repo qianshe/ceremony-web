@@ -96,8 +96,11 @@ router.beforeEach((to, from, next) => {
   // 权限检查
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('token')
-    if (!token) {
-      next({ name: 'Login' })
+    // 检查token是否存在且不为空字符串
+    if (!token || token.trim() === '') {
+      // 清除可能存在的无效token
+      localStorage.removeItem('token')
+      next({ name: 'Login', query: { redirect: to.fullPath } })
     } else {
       next()
     }

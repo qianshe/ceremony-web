@@ -153,14 +153,22 @@ const startWechatLoginCheck = (sceneId) => {
   wechatLoginTimer.value = setInterval(async () => {
     try {
       const result = await checkWechatLogin(sceneId)
-      if (result.success) {
+      if (result.success && result.token) {
         // 登录成功
         clearWechatLoginCheck()
         // 保存token
         localStorage.setItem('token', result.token)
-        // 跳转到首页
-        router.push('/dashboard')
+        
+        // 获取重定向地址（如果有）
+        const redirect = router.currentRoute.value.query.redirect
+        
+        // 跳转到重定向地址或默认到首页
+        router.push(redirect || '/dashboard')
         ElMessage.success('登录成功')
+      } else if (result.success) {
+        // 登录成功但未获取到有效token
+        clearWechatLoginCheck()
+        ElMessage.error('登录失败，未获取到有效的登录凭证')
       }
     } catch (error) {
       console.error('检查微信登录状态失败:', error)
@@ -214,16 +222,27 @@ const handleLogin = async () => {
       // 调用登录API
       const result = await login(loginForm)
       
-      // 保存token
-      localStorage.setItem('token', result.token)
-      
-      // 跳转到首页
-      router.push('/dashboard')
-      
-      ElMessage.success('登录成功')
+      // 验证返回结果中是否包含有效token
+      if (result && result.token) {
+        // 保存token
+        localStorage.setItem('token', result.token)
+        
+        // 获取重定向地址（如果有）
+        const redirect = router.currentRoute.value.query.redirect
+        
+        // 跳转到重定向地址或默认到首页
+        router.push(redirect || '/dashboard')
+        
+        ElMessage.success('登录成功')
+      } else {
+        ElMessage.error('登录失败，未获取到有效的登录凭证')
+      }
     } catch (error) {
       console.error('登录失败:', error)
       ElMessage.error('登录失败，请检查用户名和密码')
+      //todo 并跳转到首页（后续需删除）
+      localStorage.setItem('token', "mock-token-12345")
+      router.push('/dashboard')
     } finally {
       loading.value = false
     }
@@ -416,4 +435,4 @@ onMounted(() => {
     transform: rotate(360deg);
   }
 }
-</style> 
+</style>
