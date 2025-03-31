@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // 导入各模块组件
-import { Login } from '../views/auth'
-import { Dashboard, Statistics } from '../views/dashboard'
-import { UserManage, UserProfile } from '../views/user'
-import { ProductManage, ProductCategory, ProductSupplier } from '../views/product'
-import { OrderManage } from '../views/order'
-import { ProcessManage } from '../views/process'
-import { NotFound } from '../views/common'
+import { Login, 
+  NotFound,
+  Dashboard, 
+  Statistics, 
+  OrderManage, 
+  ProcessManage, 
+  ProductManage, 
+  ProductCategory, 
+  ProductSupplier, 
+  UserManage, 
+  UserProfile } from '../views'
 
 // 路由配置
 const routes = [
