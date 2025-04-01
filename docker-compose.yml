@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api-server
+    networks:
+      - app-network
+
+  api-server:
+    build:
+      context: ../ceremony-server
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    ports:
+      - "8080:8080"
+    volumes:
+      - api-data:/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
