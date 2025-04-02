@@ -1,8 +1,11 @@
 import { get, post, put, del } from './request'
 
-// 用户登录
+// 管理员登录
 export function login(data) {
-  return post('/user/login', data)
+  return post('/api/admin/auth/login', {
+    username: data.username,
+    password: data.password
+  })
 }
 
 // 获取微信登录二维码

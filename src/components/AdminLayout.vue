@@ -69,7 +69,7 @@
       <div class="top-navbar">
         <div class="left-section">
           <el-button 
-            type="text" 
+            link
             class="collapse-btn"
             @click="toggleCollapse"
           >
@@ -90,7 +90,7 @@
         <div class="user-info">
           <el-dropdown trigger="click">
             <span class="user-dropdown-link">
-              {{ username }} <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              {{ username }} <el-icon class="el-icon--right"><el-icon-arrow-down /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>

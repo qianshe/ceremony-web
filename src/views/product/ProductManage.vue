@@ -19,7 +19,7 @@
           </el-form-item>
           
           <el-form-item label="商品分类">
-            <el-select v-model="searchForm.categoryId" placeholder="请选择分类" clearable>
+            <el-select v-model="searchForm.categoryId" placeholder="请选择分类" clearable style="width: 200px;">
               <el-option 
                 v-for="item in categoryList" 
                 :key="item.id" 
@@ -30,7 +30,7 @@
           </el-form-item>
           
           <el-form-item label="库存状态">
-            <el-select v-model="searchForm.stockStatus" placeholder="请选择" clearable>
+            <el-select v-model="searchForm.stockStatus" placeholder="请选择" clearable style="width: 200px;">
               <el-option label="库存充足" value="adequate" />
               <el-option label="库存不足" value="low" />
               <el-option label="已售罄" value="empty" />
@@ -58,7 +58,7 @@
           <el-table-column prop="name" label="商品名称" min-width="150">
             <template #default="scope">
               <div class="product-name-cell">
-                <el-avatar shape="square" :size="40" :src="scope.row.image" />
+                <el-avatar shape="square" :size="40" :src="scope.row.imageUrl" />
                 <span class="ml-10">{{ scope.row.name }}</span>
               </div>
             </template>
@@ -104,22 +104,20 @@
                 </el-button>
               </el-tooltip>
               
-              <el-tooltip content="删除商品" placement="top">
-                <el-popconfirm
-                  title="确定要删除该商品吗?"
-                  @confirm="handleDelete(scope.row.id)"
-                >
-                  <template #reference>
-                    <el-button 
-                      link 
-                      type="danger" 
-                      size="small"
-                    >
-                      <el-icon><el-icon-delete /></el-icon> 删除
-                    </el-button>
-                  </template>
-                </el-popconfirm>
-              </el-tooltip>
+              <el-popconfirm
+                title="确定要删除该商品吗?"
+                @confirm="handleDelete(scope.row.id)"
+              >
+                <template #reference>
+                  <el-button 
+                    link 
+                    type="danger" 
+                    size="small"
+                  >
+                    <el-icon><el-icon-delete /></el-icon> 删除
+                  </el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -206,7 +204,7 @@
           <el-input
             v-model="productForm.description"
             type="textarea"
-            rows="4"
+            :rows="4"
             placeholder="请输入商品使用说明"
           />
         </el-form-item>
@@ -244,7 +242,7 @@
           </el-form-item>
           
           <el-form-item label="备注">
-            <el-input v-model="stockForm.remark" type="textarea" rows="2" placeholder="请输入备注信息" />
+            <el-input v-model="stockForm.remark" type="textarea" :rows="2" placeholder="请输入备注信息" />
           </el-form-item>
         </el-form>
       </div>
@@ -260,7 +258,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import AdminLayout from '@/components/AdminLayout.vue'
@@ -326,7 +324,8 @@ const productForm = reactive({
   stock: 0,
   image: '',
   description: '',
-  status: 1 // 默认上架状态
+  status: 1, // 默认上架状态
+  updateTime: '' // 添加更新时间字段
 })
 
 // 表单验证规则
@@ -504,6 +503,8 @@ const handleEdit = async (row) => {
   } catch (error) {
     console.error('获取商品详情失败', error)
     ElMessage.error('获取商品详情失败')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -521,6 +522,7 @@ const resetProductForm = () => {
   productForm.image = ''
   productForm.description = ''
   productForm.status = 1
+  productForm.updateTime = ''
   
   // 重置文件列表
   fileList.value = []
@@ -531,29 +533,43 @@ const submitProductForm = () => {
   productFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        // 构建提交数据
-        const productData = {
-          name: productForm.name,
-          price: productForm.price,
-          stock: productForm.stock,
-          categoryId: productForm.categoryId,
-          description: productForm.description,
-          image: productForm.image,
-          status: productForm.status
-        }
-        
+        // 如果是编辑操作，先获取最新数据进行比对
         if (productForm.id) {
-          // 编辑商品
-          await updateProduct(productForm.id, productData)
-          ElMessage.success('更新商品成功')
-        } else {
-          // 添加商品
-          await addProduct(productData)
-          ElMessage.success('添加商品成功')
+          const latestProduct = await getProductDetail(productForm.id)
+          
+          // 检查数据是否已被其他用户修改
+          if (latestProduct.updateTime && latestProduct.updateTime !== productForm.updateTime) {
+            return ElMessageBox.confirm(
+              '该商品数据已被其他用户修改，提交将覆盖最新修改，是否继续？', 
+              '数据已更新', 
+              {
+                confirmButtonText: '继续提交',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }
+            ).then(() => {
+              // 用户确认继续，使用最新的updateTime
+              productForm.updateTime = latestProduct.updateTime
+              saveProductData()
+            }).catch(() => {
+              // 用户取消，刷新表单数据
+              Object.assign(productForm, latestProduct)
+              
+              // 如果有图片，重新设置文件列表
+              if (latestProduct.imageUrl) {
+                fileList.value = [{
+                  name: '当前图片',
+                  url: latestProduct.imageUrl
+                }]
+              } else {
+                fileList.value = []
+              }
+            })
+          }
         }
         
-        dialogVisible.value = false
-        loadProductList() // 刷新列表
+        // 直接保存数据
+        await saveProductData()
       } catch (error) {
         console.error('保存商品失败', error)
         ElMessage.error('保存商品失败: ' + (error.message || '未知错误'))
@@ -562,32 +578,169 @@ const submitProductForm = () => {
   })
 }
 
+// 实际保存商品数据
+const saveProductData = async () => {
+  try {
+    // 构建提交数据
+    const productData = {
+      id: productForm.id,
+      name: productForm.name,
+      price: productForm.price,
+      stock: productForm.stock,
+      categoryId: productForm.categoryId,
+      description: productForm.description,
+      image: productForm.image,
+      status: productForm.status,
+      updateTime: productForm.updateTime // 传递更新时间用于乐观锁控制
+    }
+    
+    if (productForm.id) {
+      // 编辑商品
+      await updateProduct(productForm.id, productData)
+      // 获取最新数据更新表单，添加时间戳防止缓存
+      const timestamp = new Date().getTime()
+      const latestProduct = await getProductDetail(productForm.id, { _t: timestamp })
+      
+      console.log('保存后获取的最新商品数据:', latestProduct) // 添加日志，检查获取的数据
+      
+      // 确保所有字段都正确更新
+      Object.keys(productForm).forEach(key => {
+        if (key in latestProduct) {
+          productForm[key] = latestProduct[key]
+        }
+      })
+      
+      ElMessage.success('更新商品成功')
+    } else {
+      // 添加商品
+      const result = await addProduct(productData)
+      // 如果后端返回了完整的商品数据，更新表单
+      if (result && result.id) {
+        console.log('添加商品后返回的数据:', result) // 添加日志，检查获取的数据
+        
+        Object.keys(productForm).forEach(key => {
+          if (key in result) {
+            productForm[key] = result[key]
+          }
+        })
+      }
+      ElMessage.success('添加商品成功')
+    }
+    
+    // 更新列表后再关闭对话框，确保数据一致性
+    await loadProductList() // 刷新列表
+    dialogVisible.value = false
+  } catch (error) {
+    console.error('保存商品失败', error)
+    ElMessage.error('保存商品失败: ' + (error.message || '未知错误'))
+    throw error // 向上传递错误，让上层处理
+  }
+}
+
 // 调整库存
-const handleStockUpdate = (row) => {
-  currentProduct.id = row.id
-  currentProduct.name = row.name
-  currentProduct.stock = row.stock
-  
-  stockForm.productId = row.id
-  stockForm.delta = 0
-  
-  stockDialogVisible.value = true
+const handleStockUpdate = async (row) => {
+  try {
+    loading.value = true
+    
+    // 添加时间戳，防止API缓存
+    const timestamp = new Date().getTime()
+    // 从服务器获取最新的商品数据
+    const latestProduct = await getProductDetail(row.id, { _t: timestamp })
+    
+    console.log('库存调整窗口获取的商品数据:', latestProduct) // 添加日志，检查获取的数据
+    
+    // 使用最新数据设置当前产品信息
+    Object.assign(currentProduct, {
+      id: latestProduct.id,
+      name: latestProduct.name,
+      stock: latestProduct.stock,
+      updateTime: latestProduct.updateTime
+    })
+    
+    // 重置库存表单
+    stockForm.productId = latestProduct.id
+    stockForm.delta = 0
+    stockForm.remark = ''
+    
+    stockDialogVisible.value = true
+  } catch (error) {
+    console.error('获取商品详情失败', error)
+    ElMessage.error('获取商品详情失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 提交库存调整
 const submitStockUpdate = async () => {
   try {
-    await updateProductStock({
-      productId: stockForm.productId,
-      delta: stockForm.delta
-    })
+    // 再次获取最新库存数据进行比对，添加时间戳防止缓存
+    const timestamp = new Date().getTime()
+    const latestProduct = await getProductDetail(stockForm.productId, { _t: timestamp })
     
-    stockDialogVisible.value = false
-    ElMessage.success('库存调整成功')
-    loadProductList() // 刷新列表
+    console.log('提交库存调整前获取的最新数据:', latestProduct) // 添加日志
+    
+    // 如果库存已经被修改，提示用户
+    if (latestProduct.stock !== currentProduct.stock) {
+      return ElMessageBox.confirm(
+        `当前库存已被修改(${currentProduct.stock} → ${latestProduct.stock})，是否仍要继续操作？`, 
+        '库存已更新', 
+        {
+          confirmButtonText: '继续调整',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        // 用户确认继续，更新当前显示的库存值和其他数据
+        Object.assign(currentProduct, {
+          stock: latestProduct.stock,
+          updateTime: latestProduct.updateTime
+        })
+        await processStockUpdate()
+      }).catch(() => {
+        // 用户取消，关闭对话框
+        stockDialogVisible.value = false
+        loadProductList() // 刷新列表
+      })
+    }
+    
+    // 正常进行库存调整
+    await processStockUpdate()
   } catch (error) {
     console.error('调整库存失败', error)
     ElMessage.error('调整库存失败: ' + (error.message || '未知错误'))
+  }
+}
+
+// 实际处理库存更新
+const processStockUpdate = async () => {
+  try {
+    await updateProductStock({
+      productId: stockForm.productId,
+      delta: stockForm.delta,
+      currentStock: currentProduct.stock, // 传递当前库存用于乐观锁控制
+      remark: stockForm.remark
+    })
+    
+    // 获取最新的商品数据，添加时间戳防止缓存
+    const timestamp = new Date().getTime()
+    const latestProduct = await getProductDetail(stockForm.productId, { _t: timestamp })
+    
+    console.log('库存调整后获取的最新数据:', latestProduct) // 添加日志
+    
+    // 更新当前显示的库存值和其他可能更新的数据
+    Object.assign(currentProduct, {
+      stock: latestProduct.stock,
+      updateTime: latestProduct.updateTime
+    })
+    
+    // 先更新列表，再关闭对话框
+    await loadProductList() // 刷新列表
+    ElMessage.success('库存调整成功')
+    stockDialogVisible.value = false
+  } catch (error) {
+    ElMessage.error('调整库存失败: ' + (error.message || '未知错误'))
+    throw error
   }
 }
 

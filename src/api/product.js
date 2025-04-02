@@ -6,8 +6,8 @@ export function getProductList(params) {
 }
 
 // 获取商品详情
-export function getProductDetail(id) {
-  return get(`/api/admin/products/${id}`)
+export function getProductDetail(id, params = {}) {
+  return get(`/api/admin/products/${id}`, params)
 }
 
 // 添加商品

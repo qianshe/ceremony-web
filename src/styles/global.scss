@@ -119,3 +119,22 @@ html, body {
     padding: 0 20px;
   }
 } 
+
+/* 表单组件样式 */
+.el-select {
+  min-width: 200px; /* 确保下拉框有基本宽度 */
+}
+
+.filter-container {
+  .el-form-item {
+    margin-bottom: 18px;
+    
+    .el-select {
+      width: 200px; /* 搜索区域下拉框固定宽度 */
+    }
+    
+    .el-input {
+      width: 200px; /* 搜索区域输入框固定宽度 */
+    }
+  }
+} 

@@ -79,12 +79,13 @@
           <p>扫描上方二维码完成登录</p>
         </div>
         <div class="qrcode-refresh">
-          <el-button 
-            type="text" 
-            :disabled="loading" 
+          <el-button
+            v-if="qrcodeLoading"
+            link
             @click="refreshQrCode"
+            class="refresh-btn"
           >
-            <el-icon><Refresh /></el-icon> 刷新二维码
+            <el-icon><el-icon-refresh /></el-icon> 刷新二维码
           </el-button>
         </div>
       </div>
@@ -109,6 +110,7 @@ const loading = ref(false)
 const loginType = ref('account') // account 账号密码登录 | wechat 微信扫码登录
 const wechatQrCode = ref('') // 微信二维码图片地址
 const wechatLoginTimer = ref(null) // 轮询微信登录状态的定时器
+const qrcodeLoading = ref(false) // 控制二维码加载状态
 
 // 切换登录方式
 const switchLoginType = (type) => {
@@ -125,7 +127,7 @@ const switchLoginType = (type) => {
 
 // 获取微信登录二维码
 const getQrCode = async () => {
-  loading.value = true
+  qrcodeLoading.value = true
   try {
     const data = await getWechatQrCode()
     wechatQrCode.value = data.qrCodeUrl
@@ -134,7 +136,7 @@ const getQrCode = async () => {
   } catch (error) {
     ElMessage.error('获取微信二维码失败，请重试')
   } finally {
-    loading.value = false
+    qrcodeLoading.value = false
   }
 }
 
@@ -227,6 +229,11 @@ const handleLogin = async () => {
         // 保存token
         localStorage.setItem('token', result.token)
         
+        // 可以选择保存其他用户信息
+        localStorage.setItem('userId', result.userId)
+        localStorage.setItem('username', result.username)
+        localStorage.setItem('role', result.role)
+        
         // 获取重定向地址（如果有）
         const redirect = router.currentRoute.value.query.redirect
         
@@ -239,10 +246,7 @@ const handleLogin = async () => {
       }
     } catch (error) {
       console.error('登录失败:', error)
-      ElMessage.error('登录失败，请检查用户名和密码')
-      //todo 并跳转到首页（后续需删除）
-      localStorage.setItem('token', "mock-token-12345")
-      router.push('/dashboard')
+      ElMessage.error(error.message || '登录失败，请检查用户名和密码')
     } finally {
       loading.value = false
     }

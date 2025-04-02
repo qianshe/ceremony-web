@@ -4,8 +4,13 @@ import router from '../router'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 15000
+  baseURL: '',  // 不设置 baseURL
+  timeout: 15000,
+  headers: {
+    'Accept': '*/*',
+    'Content-Type': 'application/json',
+    'Authorization': ''  // 初始化为空字符串，匹配 curl 中的空 Authorization
+  }
 })
 
 // 请求拦截器
@@ -16,6 +21,11 @@ service.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
+    
+    // 确保每个请求都有这些头
+    config.headers['Accept'] = '*/*'
+    config.headers['Content-Type'] = 'application/json'
+    
     return config
   },
   error => {
@@ -46,6 +56,7 @@ service.interceptors.response.use(
       
       return Promise.reject(new Error(res.message || '系统错误'))
     } else {
+      // 直接返回 data 字段中的数据，这样外部就可以直接使用
       return res.data
     }
   },
