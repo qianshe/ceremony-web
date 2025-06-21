@@ -1,5 +1,5 @@
-version: '3.8'
 
+# 使用最新的Docker Compose规范（无需显式声明version）
 services:
   web:
     build:
@@ -13,9 +13,7 @@ services:
       - app-network
 
   api-server:
-    build:
-      context: ../ceremony-server
-      dockerfile: Dockerfile
+    image: qianshe-api:0.0.1
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - JAVA_OPTS=-Xmx512m -Xms256m
@@ -25,6 +23,11 @@ services:
       - api-data:/data
     networks:
       - app-network
+
+volumes:
+  api-data:
+    # 定义api-data卷用于持久化数据
+    driver: local
 
 networks:
   app-network:

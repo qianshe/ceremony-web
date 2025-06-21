@@ -27,23 +27,54 @@
 
 - Node.js 14.0+
 - npm 6.0+
+- Docker 20.10+ (用于Docker部署)
+- Docker Compose 2.0+ (用于Docker部署)
 
-### 安装依赖
+### 本地开发
+
+#### 安装依赖
 
 ```bash
 npm install
 ```
 
-### 开发模式
+#### 开发模式
 
 ```bash
 npm run dev
 ```
 
-### 构建生产版本
+#### 构建生产版本
 
 ```bash
 npm run build
+```
+
+### Docker部署
+
+本项目支持使用Docker进行部署，包含前端和后端服务。
+
+#### 使用Docker Compose部署
+
+1. 确保Docker和Docker Compose已安装
+2. 确保后端项目`ceremony-server`与本项目在同一目录层级
+3. 执行以下命令启动服务：
+
+```bash
+docker compose up -d
+```
+
+4. 访问 http://localhost 即可打开前端页面
+5. 后端API服务运行在 http://localhost:8080
+
+#### 自定义网络配置
+
+项目使用了名为`ceremony-app-network`的自定义网络，如果需要其他服务连接到此网络，可以在其docker-compose.yml中添加：
+
+```yaml
+networks:
+  external:
+    name: ceremony-app-network
 ```
 
 ## 项目结构
@@ -63,6 +94,9 @@ npm run build
 ├── .gitignore          # Git忽略文件
 ├── index.html          # HTML入口文件
 ├── package.json        # 项目依赖
+├── Dockerfile          # Docker构建配置
+├── docker-compose.yml  # Docker Compose配置
+├── nginx.conf          # Nginx配置文件
 └── README.md           # 项目说明
 ```
 
@@ -90,6 +124,8 @@ npm run build
 - Element Plus：UI组件库
 - Axios：HTTP请求
 - Vite：构建工具
+- Docker：容器化部署
+- Nginx：Web服务器和反向代理
 
 ## 贡献指南
 
@@ -97,4 +133,4 @@ npm run build
 
 ## 许可协议
 
-[MIT](./LICENSE) 
+[MIT](./LICENSE)

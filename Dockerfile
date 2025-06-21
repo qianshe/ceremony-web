@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # 使用nginx作为生产环境服务器
-FROM nginx:alpine
+FROM nginx:latest
 
 # 复制构建产物到nginx目录
 COPY --from=builder /app/dist /usr/share/nginx/html
